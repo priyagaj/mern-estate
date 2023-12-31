@@ -22,7 +22,7 @@ export default function SignUp() {
       })
       setLoading(false)
       setErr(false);
-      navigate('/sign-up')
+      navigate('/sign-in')
     }catch(e){
       setLoading(false)
       setErr(e?.response?.data?.message)
@@ -54,17 +54,18 @@ export default function SignUp() {
           onChange={handleChange}
         />
         <button disabled={loading} className="bg-slate-700 p-3 rounded-lg text-white hover:opacity-95 disabled:opacity-70 uppercase">
-          {err ? err : 'Sign Up'}
+          {loading ? 'loading...' : 'Sign Up'}
         </button>
       </form>
       <div>
         <p className="px-3">
           Have an account ? 
           <Link to={'/sign-in'}>
-          <span className="text-blue-700"> Sign In</span>
+          <span className="text-blue-700">Sign In</span>
           </Link>
         </p>
       </div>
+      { err && <p className="text-red-500">{err}</p>}
     </div>
   );
 }
