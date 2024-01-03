@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 export default function SignIn() {
   const [formData,setFormData] =  useState({});
-  const [err,setErr] = useState(null);
-  const [loading,setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector(state => state.user)
+
   const handleChange = (e) => {
     setFormData({
       ...formData, [e.target.id]: e.target.value
@@ -14,19 +18,17 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
-      setLoading(true)
+      dispatch(signInStart())
       const res = await axios({
         url: '/api/auth/sign-in',
         method: 'POST',
         data: formData
       })
-      setLoading(false)
-      setErr(false);
-      navigate('/home')
-    }catch(e){
-      setLoading(false)
-      setErr(e?.response?.data?.message)
-    }  }
+      dispatch(signInSuccess(res))
+      navigate('/')
+    }catch(err){
+      dispatch(signInFailure(err.response.data.message))
+    } }
  // console.log('formData====',formData)
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -49,16 +51,17 @@ export default function SignIn() {
         <button disabled={loading} className="bg-slate-700 p-3 rounded-lg text-white hover:opacity-95 disabled:opacity-70 uppercase">
           {loading ? 'loading...' : 'Sign In'}
         </button>
+      <OAuth />
       </form>
       <div>
         <p className="px-3">
-          Have an account ? 
-          <Link to={'/sign-in'}>
-          <span className="text-blue-700">Sign In</span>
+          Dont have an account ? 
+          <Link to={'/sign-up'}>
+          <span className="text-blue-700"> Sign Up</span>
           </Link>
         </p>
       </div>
-      { err && <p className="text-red-500">{err}</p>}
+      { error && <p className="text-red-500">{error}</p>}
     </div>
   );
 }

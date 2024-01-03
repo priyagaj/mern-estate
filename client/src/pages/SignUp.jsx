@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import OAuth from "../components/OAuth";
 export default function SignUp() {
   const [formData,setFormData] =  useState({});
   const [err,setErr] = useState(null);
@@ -56,12 +57,13 @@ export default function SignUp() {
         <button disabled={loading} className="bg-slate-700 p-3 rounded-lg text-white hover:opacity-95 disabled:opacity-70 uppercase">
           {loading ? 'loading...' : 'Sign Up'}
         </button>
+        <OAuth />
       </form>
       <div>
         <p className="px-3">
           Have an account ? 
           <Link to={'/sign-in'}>
-          <span className="text-blue-700">Sign In</span>
+          <span className="text-blue-700"> Sign In</span>
           </Link>
         </p>
       </div>
