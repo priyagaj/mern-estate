@@ -33,27 +33,31 @@ export const signIn = async (req, res, next) => {
   }
 };
 
-export const google = async (req,res,next) => {
-  try{
-    const user = await User.findOne({ email: req.body.email });
-    if(user){
-      const token = jwt.sign({ id: user._id}, process.env.JWT_SECRET);
-      const { password: pass, ...rest } = user._doc;
-      res.cookie('access_token',token,{ httpOnly: true }).status(200).send(rest)
-    }else{
-      const password = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8) //36-26letters + 9 numbers combination 
-      const hashedPassword = bcryptjs.hashSync(password,10)
-      const newUser = new User({ userName: req.body.name.split(' ').join('').toLowerCase()+Math.random().toString(36).slice(-8),
-      email: req.body.email,
-      avatar: req.body.photo,
-      password: hashedPassword
-    });
-    await newUser.save();
-    const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET)
-    const { password: pass, ...rest } = newUser._doc;
-    res.cookie("access_token",token,{ httpOnly: true}).status(200).send(rest)
+export const google = async (req, res, next) => {
+  try {
+    let user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      const password =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8); //36-26letters + 9 numbers combination
+      const hashedPassword = bcryptjs.hashSync(password, 10);
+      user = new User({
+        userName:
+          req.body.name.split(" ").join("").toLowerCase() +
+          Math.random().toString(36).slice(-8),
+        email: req.body.email,
+        avatar: req.body.photo,
+        password: hashedPassword,
+      });
+      await user.save();
     }
-  }catch(e){
-    next(e)
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const { password: pass, ...rest } = user._doc;
+    res
+      .cookie("access_token", token, { httpOnly: true })
+      .status(200)
+      .send(rest);
+  } catch (e) {
+    next(e);
   }
-}
+};
